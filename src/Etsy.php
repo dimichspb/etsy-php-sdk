@@ -175,6 +175,19 @@ class Etsy {
     return static::getResource($response, "Taxonomy");
   }
 
+    /**
+     * Retrieves a list of available shipping profiles
+     *
+     * @param int $shop_id
+     * @return Etsy\Collection[Etsy\Resources\ShippingProfile]
+     */
+    public function getShippingProfiles($shop_id) {
+        $response = static::$client->get(
+            "/application/shops/{$shop_id}/shipping-profiles"
+        );
+        return static::getResource($response, "ShippingProfile");
+    }
+
   /**
    * Retrieves a list of available shipping carriers and the mail classes associated with them for a given country
    *
