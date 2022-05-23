@@ -3,6 +3,7 @@
 namespace Etsy;
 
 use Etsy\Etsy;
+use stdClass;
 
 /**
  * Base resource object.
@@ -38,7 +39,7 @@ class Resource {
       $properties = $this->linkAssociations($properties);
     }
     else {
-      $properties = new \stdClass;
+      $properties = new stdClass;
     }
     $this->_properties = $properties;
   }
@@ -85,10 +86,11 @@ class Resource {
   /**
    * Links the associations to their respective object classes.
    *
-   * @param \stdClass $properties
-   * @return \stdClass
+   * @param stdClass $properties
+   * @return stdClass
    */
-  protected function linkAssociations($properties) {
+  protected function linkAssociations(stdClass $properties): stdClass
+  {
     foreach($this->_associations as $association => $resource) {
       if(isset($properties->$association)) {
         if(is_array($properties->$association)) {
@@ -111,10 +113,11 @@ class Resource {
   /**
    * Renames properties to cater for Etsy's inconsistent bizzare naming decisions.
    *
-   * @param \stdClass $properties
-   * @return \stdClass
+   * @param stdClass $properties
+   * @return stdClass
    */
-  protected function renameProperties($properties) {
+  protected function renameProperties(stdClass $properties): stdClass
+  {
     foreach($this->_rename as $expecting => $new) {
       if(isset($properties->$expecting)) {
         $properties->$new = $properties->$expecting;
@@ -122,6 +125,24 @@ class Resource {
       }
     }
     return $properties;
+  }
+
+  protected function createRequest(string $url, array $data, string $method = "POST"): Resource
+  {
+      $result = $this->request(
+          $method,
+          $url,
+          basename(str_replace('\\', '/', get_class($this))),
+          $data
+      );
+      // Update the existing properties.
+      $properties = get_object_vars($result)['_properties'];
+      foreach($properties as $property => $value) {
+          if(isset($this->_properties->{$property})) {
+              $this->_properties->{$property} = $value;
+          }
+      }
+      return $this;
   }
 
   /**
@@ -132,7 +153,8 @@ class Resource {
    * @param string $method
    * @return Resource
    */
-  protected function updateRequest(string $url, array $data, $method = "PUT") {
+  protected function updateRequest(string $url, array $data, string $method = "PUT"): Resource
+  {
     $result = $this->request(
         $method,
         $url,
@@ -149,15 +171,16 @@ class Resource {
     return $this;
   }
 
-  /**
-   * Performs a DELETE request with the Etsy API. Either returns true or false
-   * regardless of if the resource cannot be found or is invalid.
-   *
-   * @param string $url
-   * @param string $data
-   * @return boolean
-   */
-  protected function deleteRequest(string $url, array $data = []) {
+    /**
+     * Performs a DELETE request with the Etsy API. Either returns true or false
+     * regardless of if the resource cannot be found or is invalid.
+     *
+     * @param string $url
+     * @param array $data
+     * @return boolean
+     */
+  protected function deleteRequest(string $url, array $data = []): bool
+  {
     $response = Etsy::$client->delete(
         $url,
         $data
@@ -179,7 +202,8 @@ class Resource {
     string $url,
     string $resource,
     array $params = []
-  ) {
+  ): Collection
+  {
     $response = Etsy::$client->{strtolower($method)}(
       $url,
       $params
@@ -192,7 +216,8 @@ class Resource {
    *
    * @return string
    */
-  public function toJson() {
+  public function toJson(): string
+  {
     return json_encode($this->toArray());
   }
 
@@ -201,7 +226,8 @@ class Resource {
    *
    * @return array
    */
-  public function toArray() {
+  public function toArray(): array
+  {
     $array = [];
     $properties = get_object_vars($this)['_properties'];
     foreach($properties as $property => $value) {
