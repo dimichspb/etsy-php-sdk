@@ -10,6 +10,10 @@ use Etsy\Resource;
  *
  * @link https://developers.etsy.com/documentation/reference/#tag/User
  * @author Rhys Hall hello@rhyshall.com
+ *
+ * @property float $id
+ * @property string $login_name
+ * @property string $email
  */
 class User extends Resource {
 

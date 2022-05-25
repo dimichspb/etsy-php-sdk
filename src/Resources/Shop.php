@@ -13,6 +13,7 @@ use Etsy\Exception\ApiException;
  * @author Rhys Hall hello@rhyshall.com
  *
  * @property float $shop_id
+ * @property string $shop_name
  * @property array $languages
  */
 class Shop extends Resource {
