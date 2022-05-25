@@ -17,6 +17,7 @@ use Etsy\Utils\{
  * Etsy oAuth client class.
  *
  * @author Rhys Hall hello@rhyshall.com
+ * @method get(string $string, array $params = [])
  */
 class Client {
 

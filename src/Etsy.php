@@ -4,6 +4,12 @@ namespace Etsy;
 
 use Etsy\OAuth\Client;
 use Etsy\Exception\ApiException;
+use Etsy\Resources\Listing;
+use Etsy\Resources\ShippingCarrier;
+use Etsy\Resources\ShippingProfile;
+use Etsy\Resources\Shop;
+use Etsy\Resources\Taxonomy;
+use Etsy\Resources\User;
 
 class Etsy {
 
@@ -18,7 +24,7 @@ class Etsy {
   protected $client_id;
 
   /**
-   * @var Etsy\OAuth\Client
+   * @var Client
    */
   public static $client;
 
@@ -65,7 +71,8 @@ class Etsy {
   public static function createCollection(
     $response,
     string $resource
-  ) {
+  ): Collection
+  {
     $collection = new Collection($resource, $response->uri);
     if(!count($response->results) || !isset($response->results)) {
       return $collection;
@@ -82,9 +89,10 @@ class Etsy {
    *
    * @param array $records
    * @param string $resource
-   * @return mixed
+   * @return array
    */
-  public static function createCollectionResources(array $records, string $resource) {
+  public static function createCollectionResources(array $records, string $resource): array
+  {
     $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
     return array_map(function($record) use($resource) {
       return new $resource($record);
@@ -94,14 +102,15 @@ class Etsy {
   /**
    * Creates a new Etsy resource.
    *
-   * @param json $record
+   * @param string $record
    * @param string $resource
-   * @return mixed
+   * @return Resource
    */
   public static function createResource(
-    $record,
-    string $resource
-  ) {
+      string $record,
+      string $resource
+  ): Resource
+  {
     $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
     return new $resource($record);
   }
@@ -112,7 +121,8 @@ class Etsy {
    * @link https://developers.etsy.com/documentation/reference#operation/ping
    * @return integer|false
    */
-  public function ping() {
+  public function ping()
+  {
     $response = static::$client->get("/application/openapi-ping");
     return $response->application_id ?? false;
   }
@@ -120,38 +130,42 @@ class Etsy {
   /**
    * Only supports getting the user for who the current API KEY is associated with.
    *
-   * @return Etsy\Resources\User
+   * @return User
    */
-  public function getUser() {
+  public function getUser(): User
+  {
     $user_id = explode(".", $this->api_key)[0];
     $response = static::$client->get("/application/users/{$user_id}");
     return static::getResource($response, "User");
   }
 
-  /**
-   * Gets an Etsy shop. If no shop_id is specified the current user will be queried for an associated shop.
-   *
-   * @param int $shop_id
-   * @return Etsy\Resources\Shop
-   */
+    /**
+     * Gets an Etsy shop. If no shop_id is specified the current user will be queried for an associated shop.
+     *
+     * @param int|null $shop_id
+     * @return Shop
+     */
   public function getShop(
     int $shop_id = null
-  ) {
-    if(!$shop_id) {
+  ): Shop
+  {
+    if (!$shop_id) {
       return $this->getUser()->getShop();
     }
     $response = static::$client->get("/application/shops/{$shop_id}");
     return static::getResource($response, "Shop");
   }
 
-  /**
-   * Search for shops using a keyword.
-   *
-   * @param string $keyword
-   * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Shop]
-   */
-  public function getShops($keyword, $params = []) {
+    /**
+     * Search for shops using a keyword.
+     *
+     * @param string $keyword
+     * @param array $params
+     * @return Collection|Shop[]
+     * @throws ApiException
+     */
+  public function getShops(string $keyword, array $params = []) : Collection
+  {
     if(!strlen(trim($keyword))) {
       throw new ApiException("You must specify a keyword when searching for Etsy shops.");
     }
@@ -160,15 +174,17 @@ class Etsy {
       "/application/shops",
       $params
     );
+
     return static::getResource($response, "Shop");
   }
 
   /**
    * Retrieves the full hierarchy tree of seller taxonomy nodes.
    *
-   * @return Etsy\Collection[Etsy\Resources\Taxonomy]
+   * @return Collection|Taxonomy[]
    */
-  public function getSellerTaxonomy() {
+  public function getSellerTaxonomy(): Collection
+  {
     $response = static::$client->get(
       "/application/seller-taxonomy/nodes"
     );
@@ -179,9 +195,10 @@ class Etsy {
      * Retrieves a list of available shipping profiles
      *
      * @param int $shop_id
-     * @return Etsy\Collection[Etsy\Resources\ShippingProfile]
+     * @return Collection|ShippingProfile[]
      */
-    public function getShippingProfiles($shop_id) {
+    public function getShippingProfiles(int $shop_id): Collection
+    {
         $response = static::$client->get(
             "/application/shops/{$shop_id}/shipping-profiles"
         );
@@ -192,9 +209,10 @@ class Etsy {
    * Retrieves a list of available shipping carriers and the mail classes associated with them for a given country
    *
    * @param string $iso_code
-   * @return Etsy\Collection[Etsy\Resources\ShippingCarrier]
+   * @return Collection|ShippingCarrier[]
    */
-  public function getShippingCarriers($iso_code) {
+  public function getShippingCarriers(string $iso_code)
+  {
     $response = static::$client->get(
       "/application/shipping-carriers",
       [
@@ -208,14 +226,15 @@ class Etsy {
    * Gets an individual listing on Etsy.
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getListing
-   * @param integer|string $listing_id
+   * @param float $listing_id
    * @param array $includes
-   * @return Etsy\Resources\Listing
+   * @return Listing
    */
   public function getListing(
-    $listing_id,
+    float $listing_id,
     array $includes = []
-  ) {
+  ): Listing
+  {
     $response = static::$client->get(
       "/application/listings/{$listing_id}",
       [
@@ -230,9 +249,10 @@ class Etsy {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/findAllListingsActive
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Listing]
+   * @return Collection|Listing[]
    */
-  public function getPublicListings(array $params = []) {
+  public function getPublicListings(array $params = []): Collection
+  {
     $response = static::$client->get(
       "/application/listings/active",
       $params
@@ -240,18 +260,20 @@ class Etsy {
     return static::getResource($response, "Listing");
   }
 
-  /**
-   * Get the specified Etsy listings. Supports a maximum of 100 listing IDs.
-   *
-   * @link https://developers.etsy.com/documentation/reference#operation/getListingsByListingIds
-   * @param array $listing_ids
-   * @param array $includes
-   * @return Etsy\Collection[Etsy\Resources\Listing]
-   */
+    /**
+     * Get the specified Etsy listings. Supports a maximum of 100 listing IDs.
+     *
+     * @link https://developers.etsy.com/documentation/reference#operation/getListingsByListingIds
+     * @param array $listing_ids
+     * @param array $includes
+     * @return Collection|Listing[]
+     * @throws ApiException
+     */
   public function getListings(
     array $listing_ids,
     array $includes = []
-  ) {
+  ): Collection
+  {
     if(!count($listing_ids)
       || count($listing_ids) > 100) {
       throw new ApiException("Query requires at least one listing ID and cannot exceed a maximum of 100 listing IDs.");

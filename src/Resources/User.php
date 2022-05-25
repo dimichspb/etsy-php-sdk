@@ -2,9 +2,8 @@
 
 namespace Etsy\Resources;
 
+use Etsy\Collection;
 use Etsy\Resource;
-use Etsy\Utils\Address as AddressUtil;
-use Etsy\Exception\SdkException;
 
 /**
  * User resource class. Represents an Etsy User.
@@ -18,9 +17,10 @@ class User extends Resource {
    * Get all addresses for this user.
    *
    * @param array $params
-   * @return Etsy\Collection[\Etsy\Resources\UserAddress]
+   * @return Collection|UserAddress[]
    */
-  public function getAddresses(array $params = []) {
+  public function getAddresses(array $params = []): Collection
+  {
     return $this->request(
       "GET",
       "/application/user/addresses",
@@ -35,9 +35,10 @@ class User extends Resource {
    * @NOTE this endpoint is not yet active.
    *
    * @param integer/string $address_id
-   * @return Etsy\Resources\UserAddress
+   * @return UserAddress
    */
-  public function getAddress($address_id) {
+  public function getAddress($address_id): UserAddress
+  {
     return $this->request(
       "GET",
       "/application/user/addresses/{$address_id}",
@@ -48,9 +49,10 @@ class User extends Resource {
   /**
    * Gets the user's Etsy shop.
    *
-   * @return Etsy\Resources\Shop
+   * @return Shop
    */
-  public function getShop() {
+  public function getShop(): Shop
+  {
     return $this->request(
       "GET",
       "/application/users/{$this->user_id}/shops",

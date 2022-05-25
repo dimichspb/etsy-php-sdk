@@ -2,6 +2,7 @@
 
 namespace Etsy\Resources;
 
+use Etsy\Collection;
 use Etsy\Resource;
 use Etsy\Exception\ApiException;
 
@@ -10,6 +11,9 @@ use Etsy\Exception\ApiException;
  *
  * @link https://developers.etsy.com/documentation/reference/#tag/Shop
  * @author Rhys Hall hello@rhyshall.com
+ *
+ * @property float $shop_id
+ * @property array $languages
  */
 class Shop extends Resource {
 
@@ -17,9 +21,10 @@ class Shop extends Resource {
    * Update the shop.
    *
    * @param array $data
-   * @return Etsy\Resources\Shop
+   * @return Shop
    */
-  public function update(array $data) {
+  public function update(array $data): Shop
+  {
     return $this->updateRequest(
       "/application/shops/{$this->shop_id}",
       $data
@@ -30,9 +35,10 @@ class Shop extends Resource {
    * Get all sections for the shop.
    *
    * @param array $params
-   * @return \Etsy\Collection
+   * @return Collection
    */
-  public function getSections($params = []) {
+  public function getSections(array $params = []): Collection
+  {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/sections",
@@ -46,9 +52,10 @@ class Shop extends Resource {
    * Get a specific shop section.
    *
    * @param integer|string $section_id
-   * @return \Etsy\Resources\ShopSection
+   * @return ShopSection
    */
-  public function getSection($section_id) {
+  public function getSection($section_id): ShopSection
+  {
     $section = $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/sections/{$section_id}",
@@ -60,13 +67,15 @@ class Shop extends Resource {
     return $section;
   }
 
-  /**
-   * Creates a new shop section.
-   *
-   * @param string $data
-   * @return \Etsy\Resources\ShopSection
-   */
-  public function createSection(string $title) {
+    /**
+     * Creates a new shop section.
+     *
+     * @param string $title
+     * @return Collection
+     * @throws ApiException
+     */
+  public function createSection(string $title): Collection
+  {
     if(!strlen(trim($title))) {
       throw new ApiException("Section title cannot be blank.");
     }
@@ -82,9 +91,10 @@ class Shop extends Resource {
    * Get all reviews for the shop.
    *
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Review]
+   * @return Collection|Review[]
    */
-  public function getReviews(array $params = []) {
+  public function getReviews(array $params = []): Collection
+  {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/reviews",
@@ -96,9 +106,10 @@ class Shop extends Resource {
   /**
    * Get all shipping profiles for the shop.
    *
-   * @return Etsy\Collection[Etsy\Resources\ShippingProfile]
+   * @return Collection|ShippingProfile[]
    */
-  public function getShippingProfiles() {
+  public function getShippingProfiles(): Collection
+  {
     $profiles = $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/shipping-profiles",
@@ -118,10 +129,11 @@ class Shop extends Resource {
   /**
    * Gets a single shipping profile for the shop.
    *
-   * @param integer|string $shipping_profile_id
-   * @return Etsy\Resources\ShippingProfile
+   * @param float $shipping_profile_id
+   * @return ShippingProfile
    */
-  public function getShippingProfile($shipping_profile_id) {
+  public function getShippingProfile(float $shipping_profile_id): ShippingProfile
+  {
     $profile = $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/shipping-profiles/{$shipping_profile_id}",
@@ -137,9 +149,10 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference/#operation/createShopShippingProfile
    * @param array $data
-   * @return Etsy\Resources\ShippingProfile
+   * @return ShippingProfile
    */
-  public function createShippingProfile(array $data) {
+  public function createShippingProfile(array $data): ShippingProfile
+  {
     $profile = $this->request(
       "POST",
       "/application/shops/{$this->shop_id}/shipping-profiles",
@@ -154,11 +167,11 @@ class Shop extends Resource {
   /**
    * Assigns the shop ID to a shipping profile.
    *
-   * @param Etsy\Resources\ShippingProfile $profile
+   * @param ShippingProfile $profile
    * @return void
    */
   private function assignShopIdToProfile(
-    \Etsy\Resources\ShippingProfile $profile
+      ShippingProfile $profile
   ) {
     $profile->shop_id = $this->shop_id;
     array_map(
@@ -179,9 +192,10 @@ class Shop extends Resource {
    * Get all receipts for the shop.
    *
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Receipt]
+   * @return Collection|Receipt[]
    */
-  public function getReceipts(array $params = []) {
+  public function getReceipts(array $params = []): Collection
+  {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/receipts",
@@ -194,10 +208,11 @@ class Shop extends Resource {
   /**
    * Gets a single receipt for the shop.
    *
-   * @param integer|string $receipt_id
-   * @return Etsy\Resources\Receipt
+   * @param float $receipt_id
+   * @return Receipt
    */
-  public function getReceipt($receipt_id) {
+  public function getReceipt(float $receipt_id): Receipt
+  {
     $receipt = $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/receipts/{$receipt_id}",
@@ -214,9 +229,10 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getShopReceiptTransactionsByShop
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Transaction]
+   * @return Collection|Transaction[]
    */
-  public function getTransactions(array $params = []) {
+  public function getTransactions(array $params = []): Collection
+  {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/transactions",
@@ -230,9 +246,10 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getShopReceiptTransaction
    * @param integer|string $transaction_id
-   * @return Etsy\Resources\Transaction
+   * @return Transaction
    */
-  public function getTransaction($transaction_id) {
+  public function getTransaction($transaction_id): Transaction
+  {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/transactions/{$transaction_id}",
@@ -245,9 +262,10 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#tag/Ledger-Entry
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\LedgerEntry]
+   * @return Collection|LedgerEntry[]
    */
-  public function getLedgerEntries(array $params = []) {
+  public function getLedgerEntries(array $params = []): Collection
+  {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/payment-account/ledger-entries",
@@ -262,9 +280,10 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getPayments
    * @param array $payment_ids
-   * @return Etsy\Collection[Etsy\Resources\Payment]
+   * @return Collection|Payment[]
    */
-  public function getPayments(array $payment_ids = []) {
+  public function getPayments(array $payment_ids = []): Collection
+  {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/payments",
@@ -278,16 +297,16 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/createDraftListing
    * @param array $data
-   * @return Etsy\Resources\Listing
+   * @return Listing
    */
-  public function createListing(array $data) {
-    $listing = $this->request(
-      "POST",
-      "/application/shops/{$this->shop_id}/listings",
-      "Listing",
-      $data
-    );
-    return $listing;
+  public function createListing(array $data): Listing
+  {
+      return $this->request(
+        "POST",
+        "/application/shops/{$this->shop_id}/listings",
+        "Listing",
+        $data
+      );
   }
 
   /**
@@ -295,16 +314,16 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getListingsByShop
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Listing]
+   * @return Collection|Listing[]
    */
-  public function getListings(array $params = []) {
-    $listings = $this->request(
-      "GET",
-      "/application/shops/{$this->shop_id}/listings",
-      "Listing",
-      $params
-    );
-    return $listings;
+  public function getListings(array $params = []): Collection
+  {
+      return $this->request(
+        "GET",
+        "/application/shops/{$this->shop_id}/listings",
+        "Listing",
+        $params
+      );
   }
 
   /**
@@ -312,16 +331,16 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/findAllActiveListingsByShop
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Listing]
+   * @return Collection|Listing[]
    */
-  public function getPublicListings(array $params = []) {
-    $listings = $this->request(
-      "GET",
-      "/application/shops/{$this->shop_id}/listings/active",
-      "Listing",
-      $params
-    );
-    return $listings;
+  public function getPublicListings(array $params = []): Collection
+  {
+      return $this->request(
+        "GET",
+        "/application/shops/{$this->shop_id}/listings/active",
+        "Listing",
+        $params
+      );
   }
 
   /**
@@ -329,16 +348,16 @@ class Shop extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getFeaturedListingsByShop
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Listing]
+   * @return Collection|Listing[]
    */
-  public function getFeaturedListings(array $params = []) {
-    $listings = $this->request(
-      "GET",
-      "/application/shops/{$this->shop_id}/listings/featured",
-      "Listing",
-      $params
-    );
-    return $listings;
+  public function getFeaturedListings(array $params = []): Collection
+  {
+      return $this->request(
+        "GET",
+        "/application/shops/{$this->shop_id}/listings/featured",
+        "Listing",
+        $params
+      );
   }
 
 }
