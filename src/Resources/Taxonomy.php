@@ -2,6 +2,7 @@
 
 namespace Etsy\Resources;
 
+use Etsy\Collection;
 use Etsy\Resource;
 
 /**
@@ -13,11 +14,12 @@ use Etsy\Resource;
 class Taxonomy extends Resource {
 
   /**
-   * Get the propertys for this Taxonomy node.
+   * Get the properties for this Taxonomy node.
    *
-   * @return \Etsy\Collection
+   * @return Collection
    */
-  public function getProperties() {
+  public function getProperties(): Collection
+  {
     return $this->request(
         'GET',
         "/application/seller-taxonomy/nodes/{$this->id}/properties",

@@ -20,9 +20,11 @@ use Etsy\Exception\ApiException;
  * @property string $who_made
  * @property string $when_made
  * @property float $taxonomy_id
- * @property string $materials
+ * @property array $materials
  * @property bool $is_supply
  * @property float $shipping_profile_id
+ * @property \stdClass $price
+ * @property string $state
  *
  */
 class Listing extends Resource {

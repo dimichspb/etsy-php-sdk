@@ -4,6 +4,12 @@ namespace Etsy;
 
 use Etsy\Etsy;
 use Etsy\Resources\Listing;
+use Etsy\Resources\ListingFile;
+use Etsy\Resources\ListingImage;
+use Etsy\Resources\ListingInventory;
+use Etsy\Resources\ListingProduct;
+use Etsy\Resources\ListingProperty;
+use Etsy\Resources\ListingTranslation;
 use Etsy\Resources\Receipt;
 use Etsy\Resources\ShippingDestination;
 use Etsy\Resources\ShippingProfile;
@@ -205,7 +211,7 @@ class Resource {
    * @param string $url
    * @param string $resource
    * @param array $params
-   * @return Resource|Shop|User|UserAddress|ShopSection|ShippingProfile|ShippingDestination|ShippingUpgrade|Receipt|Transaction|Listing|null
+   * @return Collection|Resource|Shop|User|UserAddress|ShopSection|ShippingProfile|ShippingDestination|ShippingUpgrade|Receipt|Transaction|Listing|ListingProperty|ListingFile|ListingImage|ListingInventory|ListingProduct|ListingTranslation|null
    */
   protected function request(
     string $method,

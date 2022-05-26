@@ -193,6 +193,20 @@ class Etsy {
   }
 
     /**
+     * Retrieves the properties of seller taxonomy node.
+     *
+     * @param int $taxonomy_id
+     * @return Collection
+     */
+  public function getSellerTaxonomyProperties(int $taxonomy_id): Collection
+  {
+      $response = static::$client->get(
+          "/application/seller-taxonomy/nodes/{$taxonomy_id}/properties"
+      );
+      return static::getResource($response, "TaxonomyProperty");
+  }
+
+    /**
      * Retrieves a list of available shipping profiles
      *
      * @param int $shop_id
