@@ -14,6 +14,16 @@ use Etsy\Exception\ApiException;
  *
  * @property string $shop_id
  * @property string $listing_id
+ * @property string $title
+ * @property string $description
+ * @property int $quantity
+ * @property string $who_made
+ * @property string $when_made
+ * @property float $taxonomy_id
+ * @property string $materials
+ * @property bool $is_supply
+ * @property float $shipping_profile_id
+ *
  */
 class Listing extends Resource {
 

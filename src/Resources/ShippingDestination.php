@@ -3,6 +3,7 @@
 namespace Etsy\Resources;
 
 use Etsy\Resource;
+use stdClass;
 
 /**
  * Shipping Destination class.
@@ -13,6 +14,8 @@ use Etsy\Resource;
  * @property float $shipping_profile_destination_id
  * @property float $shipping_profile_id
  * @property float $shop_id
+ * @property stdClass $primary_cost
+ * @property stdClass $secondary_cost
  * @property string $destination_country_iso
  * @property int $min_delivery_days
  * @property int $max_delivery_days
