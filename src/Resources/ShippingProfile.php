@@ -15,8 +15,8 @@ use Etsy\Resource;
  * @property string $origin_postal_code
  * @property float $primary_cost
  * @property float $secondary_cost
- * @property int $min_processing_days
- * @property int $max_processing_days
+ * @property int $min_processing_time
+ * @property int $max_processing_time
  * @property string $processing_time_unit
  * @property string $destination_region
  * @property float $shipping_profile_id
