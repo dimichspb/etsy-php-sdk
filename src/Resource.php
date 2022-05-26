@@ -5,7 +5,9 @@ namespace Etsy;
 use Etsy\Etsy;
 use Etsy\Resources\Listing;
 use Etsy\Resources\Receipt;
+use Etsy\Resources\ShippingDestination;
 use Etsy\Resources\ShippingProfile;
+use Etsy\Resources\ShippingUpgrade;
 use Etsy\Resources\Shop;
 use Etsy\Resources\ShopSection;
 use Etsy\Resources\Transaction;
@@ -203,14 +205,14 @@ class Resource {
    * @param string $url
    * @param string $resource
    * @param array $params
-   * @return Collection|Resource|Shop|User|UserAddress|ShopSection|ShippingProfile|Receipt|Transaction|Listing|null
+   * @return Resource|Shop|User|UserAddress|ShopSection|ShippingProfile|ShippingDestination|ShippingUpgrade|Receipt|Transaction|Listing|null
    */
   protected function request(
     string $method,
     string $url,
     string $resource,
     array $params = []
-  ): Collection
+  ): Resource
   {
     $response = Etsy::$client->{strtolower($method)}(
       $url,

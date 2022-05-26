@@ -9,6 +9,19 @@ use Etsy\Resource;
  *
  * @link https://developers.etsy.com/documentation/reference/#tag/Shop-ShippingProfile
  * @author Rhys Hall hello@rhyshall.com
+ *
+ * @property string $title
+ * @property string $origin_country_iso
+ * @property string $origin_postal_code
+ * @property float $primary_cost
+ * @property float $secondary_cost
+ * @property int $min_processing_days
+ * @property int $max_processing_days
+ * @property string $processing_time_unit
+ * @property string $destination_region
+ * @property float $shipping_profile_id
+ * @property float $shop_id
+);
  */
 class ShippingProfile extends Resource {
 
@@ -25,9 +38,10 @@ class ShippingProfile extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference/#operation/updateShopShippingProfile
    * @param array $data
-   * @return Etsy\Resources\ShippingProfile
+   * @return ShippingProfile
    */
-  public function update(array $data) {
+  public function update(array $data): ShippingProfile
+  {
     return $this->updateRequest(
       "/application/shops/{$this->shop_id}/shipping-profiles/{$this->shipping_profile_id}",
       $data
@@ -40,7 +54,8 @@ class ShippingProfile extends Resource {
    * @link https://developers.etsy.com/documentation/reference/#operation/deleteShopShippingProfile
    * @return boolean
    */
-  public function delete() {
+  public function delete(): bool
+  {
     return $this->deleteRequest(
       "/application/shops/{$this->shop_id}/shipping-profiles/{$this->shipping_profile_id}"
     );
@@ -51,9 +66,10 @@ class ShippingProfile extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/createShopShippingProfileDestination
    * @param array $data
-   * @return Etsy\Resources\ShippingDestination
+   * @return ShippingDestination
    */
-  public function createShippingDestination($data) {
+  public function createShippingDestination(array $data): ShippingDestination
+  {
     $destination =  $this->request(
       "POST",
       "/application/shops/{$this->shop_id}/shipping-profiles/{$this->shipping_profile_id}/destinations",
@@ -72,9 +88,10 @@ class ShippingProfile extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/createShopShippingProfileUpgrade
    * @param array $data
-   * @return Etsy\Resources\ShippingUpgrade
+   * @return ShippingUpgrade
    */
-  public function createShippingUpgrade($data) {
+  public function createShippingUpgrade(array $data): ShippingUpgrade
+  {
     $upgrade =  $this->request(
       "POST",
       "/application/shops/{$this->shop_id}/shipping-profiles/{$this->shipping_profile_id}/upgrades",

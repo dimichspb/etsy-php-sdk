@@ -10,6 +10,7 @@ use Etsy\Resources\ShippingProfile;
 use Etsy\Resources\Shop;
 use Etsy\Resources\Taxonomy;
 use Etsy\Resources\User;
+use stdClass;
 
 class Etsy {
 
@@ -99,15 +100,15 @@ class Etsy {
     }, $records);
   }
 
-  /**
-   * Creates a new Etsy resource.
-   *
-   * @param string $record
-   * @param string $resource
-   * @return Resource
-   */
+    /**
+     * Creates a new Etsy resource.
+     *
+     * @param stdClass $record
+     * @param string $resource
+     * @return Resource
+     */
   public static function createResource(
-      string $record,
+      stdClass $record,
       string $resource
   ): Resource
   {
