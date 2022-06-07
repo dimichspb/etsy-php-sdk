@@ -9,6 +9,8 @@ use Etsy\Resource;
  *
  * @link https://developers.etsy.com/documentation/reference#tag/ShopListing-Inventory
  * @author Rhys Hall hello@rhyshall.com
+ *
+ * @property array $products
  */
 class ListingInventory extends Resource {
 

@@ -218,7 +218,7 @@ class Resource {
     string $url,
     string $resource,
     array $params = []
-  ): Resource
+  )
   {
     $response = Etsy::$client->{strtolower($method)}(
       $url,

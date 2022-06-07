@@ -153,14 +153,15 @@ class Listing extends Resource {
     return $listing_file;
   }
 
-  /**
-   * Uploads a listing file.
-   *
-   * @link https://developers.etsy.com/documentation/reference#operation/uploadListingFile
-   * @param array $data
-   * @return Collection
-   */
-  public function uploadFile(array $data): Collection
+    /**
+     * Uploads a listing file.
+     *
+     * @link https://developers.etsy.com/documentation/reference#operation/uploadListingFile
+     * @param array $data
+     * @return ListingImage
+     * @throws ApiException
+     */
+  public function uploadFile(array $data): ListingImage
   {
     if(!isset($data['image']) && !isset($data['listing_image_id']))
   {
@@ -183,7 +184,7 @@ class Listing extends Resource {
    * Get the Listing Images for the listing.
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getListingImages
-   * @return Collection[Etsy\Resources\ListingImage]
+   * @return Collection|ListingImage[]
    */
   public function getImages(): Collection
   {
@@ -216,15 +217,15 @@ class Listing extends Resource {
     return $listing_image;
   }
 
-  /**
-  * Upload a listing image.
-  *
-  * @link https://developers.etsy.com/documentation/reference#operation/uploadListingImage
-  * @param array $data
-  * @return Collection
-  * @throws ApiException
-  */
-  public function uploadImage(array $data): Collection
+    /**
+     * Upload a listing image.
+     *
+     * @link https://developers.etsy.com/documentation/reference#operation/uploadListingImage
+     * @param array $data
+     * @return ListingImage
+     * @throws ApiException
+     */
+  public function uploadImage(array $data): ListingImage
   {
     if(!isset($data['image']) && !isset($data['listing_image_id'])) {
       throw new ApiException("Request requires either 'listing_image_id' or 'image' paramater.");
