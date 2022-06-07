@@ -99,9 +99,9 @@ class Listing extends Resource {
    * @NOTE This method is not ready for use and will return a 501 repsonse.
    * @link https://developers.etsy.com/documentation/reference#operation/getListingProperty
    * @param integer|string $property_id
-   * @return ListingProperty
+   * @return ListingProperty|null
    */
-  public function getListingProperty($property_id): ListingProperty
+  public function getListingProperty($property_id): ?ListingProperty
   {
     $listing_property = $this->request(
       "GET",
