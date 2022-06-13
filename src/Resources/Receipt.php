@@ -2,6 +2,7 @@
 
 namespace Etsy\Resources;
 
+use Etsy\Collection;
 use Etsy\Resource;
 
 /**
@@ -9,6 +10,16 @@ use Etsy\Resource;
  *
  * @link https://developers.etsy.com/documentation/reference#tag/Shop-Receipt
  * @author Rhys Hall hello@rhyshall.com
+ *
+ * @property int $receipt_id
+ * @property string $name
+ * @property string $first_line
+ * @property string $second_line
+ * @property string $city
+ * @property string $state
+ * @property string $zip
+ * @property string $country_iso
+ * @property bool $is_shipped
  */
 class Receipt extends Resource {
 
@@ -24,27 +35,26 @@ class Receipt extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/createReceiptShipment
    * @param array $data
-   * @return Etsy\Resources\Shipment
+   * @return Receipt
    */
-  public function createShipment(array $data) {
-    $shipment = $this->request(
+  public function createShipment(array $data): Receipt
+  {
+    $receipt = $this->request(
       "POST",
       "/application/shops/{$this->shop_id}/receipts/{$this->receipt_id}/tracking",
-      "Shipment",
+      "Receipt",
       $data
     );
-    // Add the shipment to the associated property.
-    $this->_properties->shipments[] = $shipment;
-    return $shipment;
+    return $this;
   }
 
   /**
    * Gets all transactions for the receipt.
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getShopReceiptTransactionsByReceipt
-   * @return Etsy\Collection[Etsy\Resources\Transaction]
+   * @return Collection|Transaction[]
    */
-  public function getTransactions() {
+  public function getTransactions(): Collection {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/receipts/{$this->receipt_id}/transactions",
@@ -56,9 +66,9 @@ class Receipt extends Resource {
    * Gets all payments for the receipt.
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getShopPaymentByReceiptId
-   * @return Etsy\Collection[Etsy\Resources\Payment]
+   * @return Collection|Payment[]
    */
-  public function getPayments() {
+  public function getPayments(): Collection {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/receipts/{$this->receipt_id}/payments",
@@ -71,9 +81,9 @@ class Receipt extends Resource {
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getListingsByShopReceipt
    * @param array $params
-   * @return Etsy\Collection[Etsy\Resources\Listing]
+   * @return Collection|Listing[]
    */
-  public function getListings($params = []) {
+  public function getListings(array $params = []): Collection {
     return $this->request(
       "GET",
       "/application/shops/{$this->shop_id}/receipts/{$this->receipt_id}/listings",
