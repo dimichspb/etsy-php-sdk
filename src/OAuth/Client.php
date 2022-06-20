@@ -87,55 +87,60 @@ class Client {
     ];
   }
 
-  public function __call($method, $args) {
-    if(!count($args)) {
-      throw new RequestException("No URI specified for this request. All requests require a URI and optional options array.");
-    }
-    $valid_methods = ['get', 'delete', 'patch', 'post', 'put'];
-    if(!in_array($method, $valid_methods)) {
-      throw new RequestException("{$method} is not a valid request method.");
-    }
-    $uri = $args[0];
-    if($method == 'get' && count($args[1] ?? [])) {
-      $uri .= "?".RequestUtil::prepareParameters($args[1]);
-    }
-    if(in_array($method, ['post', 'put'])) {
-      if($file = RequestUtil::prepareFile($args[1] ?? [])) {
-        $opts['multipart'] = $file;
-      }
-      else {
-        $opts['form_params'] = $args[1] ?? [];
-      }
-    }
-    if($method == 'DELETE' && count($args[1] ?? [])) {
-      $opts['query'] = $args[1];
-    }
-    $opts['headers'] = $this->headers;
-    try {
-      $client = $this->createHttpClient();
-      $response = $client->{$method}(self::API_URL.$uri, $opts);
-      $response = json_decode($response->getBody(), false);
-      if($response) {
-        $response->uri = $uri;
-      }
-      return $response;
-    }
-    catch(\Exception $e) {
-      $response = $e->getResponse();
-      $body = json_decode($response->getBody(), false);
-      $status_code = $response->getStatusCode();
-      if($status_code == 404 && !($this->config['404_error'] ?? false)) {
-        $response = new \stdClass;
-        $response->uri = $uri;
-        $response->error = "{$body->error}";
-        $response->code = $status_code;
-        return $response;
-      }
-      throw new RequestException(
+    /**
+     * @throws RequestException
+     */
+    public function __call($method, $args)
+    {
+        if(!count($args)) {
+            throw new RequestException("No URI specified for this request. All requests require a URI and optional options array.");
+        }
+        $valid_methods = ['get', 'delete', 'patch', 'post', 'put'];
+        if(!in_array($method, $valid_methods)) {
+            throw new RequestException("{$method} is not a valid request method.");
+        }
+        $uri = $args[0];
+        if ($method == 'get' && count($args[1] ?? [])) {
+            $uri .= "?".RequestUtil::prepareParameters($args[1]);
+        }
+        if (in_array($method, ['post', 'put'])) {
+            if($file = RequestUtil::prepareFile($args[1] ?? [])) {
+                $opts['multipart'] = $file;
+            } else {
+                $opts['form_params'] = $args[1] ?? [];
+            }
+        }
+        if ($method == 'DELETE' && count($args[1] ?? [])) {
+            $opts['query'] = $args[1];
+        }
+        $opts['headers'] = $this->headers;
+        try {
+            $client = $this->createHttpClient();
+            $response = $client->{$method}(self::API_URL.$uri, $opts);
+            $response = json_decode($response->getBody(), false);
+            if($response) {
+                $response->uri = $uri;
+            }
+            return $response;
+        } catch (\Exception $e) {
+            if (!method_exists($e, 'getResponse')) {
+                throw $e;
+            }
+            $response = $e->getResponse();
+            $body = json_decode($response->getBody(), false);
+            $status_code = $response->getStatusCode();
+            if ($status_code == 404 && !($this->config['404_error'] ?? false)) {
+                $response = new \stdClass;
+                $response->uri = $uri;
+                $response->error = "{$body->error}";
+                $response->code = $status_code;
+                return $response;
+            }
+            throw new RequestException(
         "Received HTTP status code [$status_code] with error \"{$body->error}\"."
-      );
+            );
+        }
     }
-  }
 
   /**
    * Generates the Etsy authorization URL. Your user will use this URL to authorize access for your API to their Etsy account.
