@@ -2,6 +2,8 @@
 
 namespace Etsy\Utils;
 
+use Etsy\OAuth\Client;
+
 /**
  *  HTTP request utilities.
  *
@@ -9,6 +11,15 @@ namespace Etsy\Utils;
  */
 class Request {
 
+    /**
+     * @var Client
+     */
+    protected static $client;
+
+    public static function setClient(Client $client)
+    {
+        self::$client = $client;
+    }
   /**
    * Prepares the request query parameters.
    *
@@ -34,7 +45,8 @@ class Request {
     return [
       [
         'name' => $type,
-        'contents' => fopen($params[$type], 'r')
+        //'contents' => fopen($params[$type], 'r')
+        'contents' => self::$client->get($params[$type]),
       ]
     ];
   }

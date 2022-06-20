@@ -10,6 +10,7 @@ use Etsy\Resources\ShippingProfile;
 use Etsy\Resources\Shop;
 use Etsy\Resources\Taxonomy;
 use Etsy\Resources\User;
+use Etsy\Utils\Request;
 use stdClass;
 
 class Etsy {
@@ -44,6 +45,8 @@ class Etsy {
     static::$client = new Client($client_id);
     static::$client->setApiKey($api_key);
     static::$client->setConfig($config);
+
+    Request::setClient(static::$client);
   }
 
   /**
