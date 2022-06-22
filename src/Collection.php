@@ -55,7 +55,7 @@ class Collection {
       $uri = explode('?', $uri);
       $this->uri = $uri[0];
       if(isset($uri[1])) {
-        $this->params = RequestUtil::getParamaters($uri[1]);
+        $this->params = RequestUtil::getParameters($uri[1]);
       }
     }
   }

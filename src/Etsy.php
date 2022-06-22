@@ -45,8 +45,6 @@ class Etsy {
     static::$client = new Client($client_id);
     static::$client->setApiKey($api_key);
     static::$client->setConfig($config);
-
-    Request::setClient(static::$client);
   }
 
   /**
