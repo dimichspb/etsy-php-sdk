@@ -11,66 +11,71 @@ use Etsy\Exception\SdkException;
  *
  * @author Rhys Hall hello@rhyshall.com
  */
-class Collection {
+class Collection
+{
+    const PAGINATION_SUPPORT = [
+        "Shop", "Review", "Listing"
+    ];
 
-  const PAGINATION_SUPPORT = [
-    "Shop", "Review", "Listing"
-  ];
+    protected $etsy;
 
-  /**
-   * @var string
-   */
-  protected $resource;
+    /**
+    * @var string
+    */
+    protected $resource;
 
-  /**
-   * @var string
-   */
-  protected $uri = false;
+    /**
+    * @var string
+    */
+    protected $uri = false;
 
-  /**
-   * @var array
-   */
-  protected $params = [];
+    /**
+    * @var array
+    */
+    protected $params = [];
 
-  /**
-   * @var array
-   */
-  protected $_append = [];
+    /**
+    * @var array
+    */
+    protected $_append = [];
 
-  /**
-   * @var array
-   */
-  public $data = [];
+    /**
+    * @var array
+    */
+    public $data = [];
 
-  /**
-   * Constructor method for the collection.
-   *
-   * @param string $resource
-   * @param string $uri
-   * @return void
-   */
-  public function __construct($resource, $uri = false) {
-    $this->resource = $resource;
-    if($uri) {
-      $uri = explode('?', $uri);
-      $this->uri = $uri[0];
-      if(isset($uri[1])) {
-        $this->params = RequestUtil::getParameters($uri[1]);
-      }
+    /**
+     * Constructor method for the collection.
+     *
+     * @param \Etsy\Etsy $etsy
+     * @param string $resource
+     * @param bool $uri
+     */
+    public function __construct(Etsy $etsy, string $resource, $uri = false)
+    {
+        $this->etsy = $etsy;
+        $this->resource = $resource;
+        if($uri) {
+            $uri = explode('?', $uri);
+            $this->uri = $uri[0];
+            if(isset($uri[1])) {
+                $this->params = RequestUtil::getParameters($uri[1]);
+            }
+        }
     }
-  }
 
-  /**
-   * Returns only the first result. Primarily used for fetching single resources.
-   *
-   * @return Etsy\Resource
-   */
-  public function first() {
-    if(!count($this->data)) {
-      return false;
+    /**
+    * Returns only the first result. Primarily used for fetching single resources.
+    *
+    * @return Resource|bool
+    */
+    public function first()
+    {
+        if(!count($this->data)) {
+            return false;
+        }
+        return $this->data[0];
     }
-    return $this->data[0];
-  }
 
   /**
    * Returns the number of resources within the collection.
@@ -137,11 +142,11 @@ class Collection {
   private function nextPage() {
     $limit = $this->params['limit'] ?? 25;
     $this->params['offset'] = ($this->params['offset'] ?? 0) + $limit;
-    $response = Etsy::$client->get(
+    $response = $this->etsy->client()->get(
       $this->uri,
       $this->params
     );
-    $collection = Etsy::getResource($response, $this->resource);
+    $collection = $this->etsy->getResource($response, $this->resource);
     if(!$collection) {
       $collection->next_page = false;
       return false;

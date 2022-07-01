@@ -54,7 +54,7 @@ class Etsy {
    * @param string $resource
    * @return mixed
    */
-  public static function getResource(
+  public function getResource(
     $response,
     string $resource
   ) {
@@ -62,24 +62,24 @@ class Etsy {
       return null;
     }
     if(isset($response->results)) {
-      return static::createCollection($response, $resource);
+      return $this->createCollection($response, $resource);
     }
-    return static::createResource($response, $resource);
+    return $this->createResource($response, $resource);
   }
 
   /**
    *
    */
-  public static function createCollection(
+  public function createCollection(
     $response,
     string $resource
   ): Collection
   {
-    $collection = new Collection($resource, $response->uri);
+    $collection = new Collection($this, $resource, $response->uri);
     if(!count($response->results) || !isset($response->results)) {
       return $collection;
     }
-    $collection->data = static::createCollectionResources(
+    $collection->data = $this->createCollectionResources(
       $response->results,
       $resource
     );
@@ -93,11 +93,11 @@ class Etsy {
    * @param string $resource
    * @return array
    */
-  public static function createCollectionResources(array $records, string $resource): array
+  public function createCollectionResources(array $records, string $resource): array
   {
     $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
     return array_map(function($record) use($resource) {
-      return new $resource($record);
+      return new $resource($this, $record);
     }, $records);
   }
 
@@ -108,13 +108,13 @@ class Etsy {
      * @param string $resource
      * @return Resource
      */
-  public static function createResource(
+  public function createResource(
       stdClass $record,
       string $resource
   ): Resource
   {
     $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
-    return new $resource($record);
+    return new $resource($this, $record);
   }
 
   /**
@@ -138,7 +138,7 @@ class Etsy {
   {
     $user_id = explode(".", $this->api_key)[0];
     $response = $this->client()->get("/application/users/{$user_id}");
-    return static::getResource($response, "User");
+    return $this->getResource($response, "User");
   }
 
     /**
@@ -155,7 +155,7 @@ class Etsy {
       return $this->getUser()->getShop();
     }
     $response = $this->client()->get("/application/shops/{$shop_id}");
-    return static::getResource($response, "Shop");
+    return $this->getResource($response, "Shop");
   }
 
     /**
@@ -177,7 +177,7 @@ class Etsy {
       $params
     );
 
-    return static::getResource($response, "Shop");
+    return $this->getResource($response, "Shop");
   }
 
   /**
@@ -190,7 +190,7 @@ class Etsy {
     $response = $this->client()->get(
       "/application/seller-taxonomy/nodes"
     );
-    return static::getResource($response, "Taxonomy");
+    return $this->getResource($response, "Taxonomy");
   }
 
     /**
@@ -204,7 +204,7 @@ class Etsy {
       $response = $this->client()->get(
           "/application/seller-taxonomy/nodes/{$taxonomy_id}/properties"
       );
-      return static::getResource($response, "TaxonomyProperty");
+      return $this->getResource($response, "TaxonomyProperty");
   }
 
     /**
@@ -218,7 +218,7 @@ class Etsy {
         $response = $this->client()->get(
             "/application/shops/{$shop_id}/shipping-profiles"
         );
-        return static::getResource($response, "ShippingProfile");
+        return $this->getResource($response, "ShippingProfile");
     }
 
   /**
@@ -235,7 +235,7 @@ class Etsy {
         "origin_country_iso" => $iso_code
       ]
     );
-    return static::getResource($response, "ShippingCarrier");
+    return $this->getResource($response, "ShippingCarrier");
   }
 
   /**
@@ -257,7 +257,7 @@ class Etsy {
         'includes' => $includes
       ]
     );
-    return static::getResource($response, "Listing");
+    return $this->getResource($response, "Listing");
   }
 
   /**
@@ -273,7 +273,7 @@ class Etsy {
       "/application/listings/active",
       $params
     );
-    return static::getResource($response, "Listing");
+    return $this->getResource($response, "Listing");
   }
 
     /**
@@ -301,10 +301,10 @@ class Etsy {
         "includes" => $includes
       ]
     );
-    return static::getResource($response, "Listing");
+    return $this->getResource($response, "Listing");
   }
 
-  protected function client(): Client
+  public function client(): Client
   {
       return $this->client;
   }

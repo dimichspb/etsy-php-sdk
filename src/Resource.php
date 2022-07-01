@@ -28,6 +28,7 @@ use stdClass;
  */
 class Resource {
 
+    protected $etsy;
   /**
    * @var array
    */
@@ -43,22 +44,23 @@ class Resource {
    */
   protected $_properties = [];
 
-  /**
-   * Constructor method for the Resource class.
-   *
-   * @param array $properties
-   * @return void
-   */
-  public function __construct($properties = false) {
-    if($properties) {
-      $properties = $this->renameProperties($properties);
-      $properties = $this->linkAssociations($properties);
+    /**
+    * Constructor method for the Resource class.
+    *
+    * @param array $properties
+    * @return void
+    */
+    public function __construct(Etsy $etsy, $properties = false)
+    {
+        $this->etsy = $etsy;
+        if($properties) {
+            $properties = $this->renameProperties($properties);
+            $properties = $this->linkAssociations($properties);
+        } else {
+            $properties = new stdClass;
+        }
+        $this->_properties = $properties;
     }
-    else {
-      $properties = new stdClass;
-    }
-    $this->_properties = $properties;
-  }
 
   /**
    * Gets a property from the _properties attribute.
@@ -110,13 +112,13 @@ class Resource {
     foreach($this->_associations as $association => $resource) {
       if(isset($properties->$association)) {
         if(is_array($properties->$association)) {
-          $properties->$association = Etsy::createCollectionResources(
+          $properties->$association = $this->etsy->createCollectionResources(
               $properties->$association,
               $resource
             );
         }
         else {
-          $properties->$association = Etsy::createResource(
+          $properties->$association = $this->etsy->createResource(
               $properties->$association,
               $resource
             );
@@ -197,7 +199,7 @@ class Resource {
      */
   protected function deleteRequest(string $url, array $data = []): bool
   {
-    $response = Etsy::$client->delete(
+    $response = $this->etsy->client()->delete(
         $url,
         $data
       );
@@ -220,11 +222,11 @@ class Resource {
     array $params = []
   )
   {
-    $response = Etsy::$client->{strtolower($method)}(
+    $response = $this->etsy->client()->{strtolower($method)}(
       $url,
       $params
     );
-    return Etsy::getResource($response, $resource);
+    return $this->etsy->getResource($response, $resource);
   }
 
   /**
