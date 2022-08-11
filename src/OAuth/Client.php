@@ -121,6 +121,12 @@ abstract class Client {
         try {
             $client = $this->createHttpClient();
             $response = $client->{$method}($uri, $opts);
+            $headers = $response->getHeaders();
+            $remainingThisSecond = $headers['X-Remaining-This-Second'][0]?? 10;
+            $value = max(0,8 - $remainingThisSecond) * 0.1;
+            if ($value > 0) {
+                sleep($value);
+            }
             $response = json_decode($response->getBody(), false);
             if($response) {
                 $response->uri = $uri;
