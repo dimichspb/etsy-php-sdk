@@ -146,8 +146,9 @@ abstract class Client {
                 $response->code = $status_code;
                 return $response;
             }
+            $error = $body && isset($body->error)? $body->error: '';
             throw new RequestException(
-        "Received HTTP status code [$status_code] with error \"{$body->error}\"."
+        "Received HTTP status code [$status_code] with error \"$error\"."
             );
         }
     }
