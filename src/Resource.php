@@ -264,4 +264,13 @@ class Resource {
     return $array;
   }
 
+
+  public function append(array $properties): Resource
+  {
+      foreach($properties as $name => $value) {
+          $this->$name = $value;
+      }
+
+      return $this;
+  }
 }
