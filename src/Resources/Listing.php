@@ -184,9 +184,9 @@ class Listing extends Resource {
    * Get the Listing Images for the listing.
    *
    * @link https://developers.etsy.com/documentation/reference#operation/getListingImages
-   * @return Collection|ListingImage[]
+   * @return Collection|ListingImage[]|ListingImage
    */
-  public function getImages(): Collection
+  public function getImages()
   {
     return $this->request(
       "GET",
