@@ -199,10 +199,12 @@ class Resource {
      */
   protected function deleteRequest(string $url, array $data = []): bool
   {
+      \Log::debug('delete request, url: "' . $url . '"', $data);
     $response = $this->etsy->client()->delete(
         $url,
         $data
       );
+      \Log::debug('delete request, response: ' . print_r($response, true));
     return !isset($response->error);
   }
 
