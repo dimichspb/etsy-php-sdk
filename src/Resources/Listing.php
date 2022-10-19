@@ -70,7 +70,7 @@ class Listing extends Resource {
   public function delete(): bool
   {
     return $this->deleteRequest(
-      "/application/shops/{$this->shop_id}/listings/{$this->listing_id}"
+      "/application/listings/{$this->listing_id}"
     );
   }
 

@@ -203,7 +203,6 @@ class Resource {
         $url,
         $data
       );
-   
     return !isset($response->error);
   }
 
