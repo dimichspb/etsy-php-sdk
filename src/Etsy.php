@@ -14,15 +14,15 @@ use stdClass;
 
 class Etsy {
 
-  /**
-   * @var string
-   */
-  protected $api_key;
+    /**
+     * @var string
+     */
+    protected $api_key;
 
-  /**
-   * @var string
-   */
-  protected $client_id;
+    /**
+     * @var string
+     */
+    protected $client_id;
 
     /**
      * @var Client
@@ -47,59 +47,59 @@ class Etsy {
         $this->client->setConfig($config);
     }
 
-  /**
-   * Returns a resource object from the request result.
-   *
-   * @param object $response
-   * @param string $resource
-   * @return mixed
-   */
-  public function getResource(
-    $response,
-    string $resource
-  ) {
-    if(!$response || ($response->error ?? false)) {
-      return null;
+    /**
+     * Returns a resource object from the request result.
+     *
+     * @param object $response
+     * @param string $resource
+     * @return mixed
+     */
+    public function getResource(
+        $response,
+        string $resource
+    ) {
+        if(!$response || ($response->error ?? false)) {
+            return null;
+        }
+        if(isset($response->results)) {
+            return $this->createCollection($response, $resource);
+        }
+        return $this->createResource($response, $resource);
     }
-    if(isset($response->results)) {
-      return $this->createCollection($response, $resource);
-    }
-    return $this->createResource($response, $resource);
-  }
 
-  /**
-   *
-   */
-  public function createCollection(
-    $response,
-    string $resource
-  ): Collection
-  {
-    $collection = new Collection($this, $resource, $response->uri);
-    if(!count($response->results) || !isset($response->results)) {
-      return $collection;
+    /**
+     *
+     */
+    public function createCollection(
+        $response,
+        string $resource
+    ): Collection
+    {
+        $collection = new Collection($this, $resource, $response->uri);
+        if(!count($response->results) || !isset($response->results)) {
+            return $collection;
+        }
+        $collection->data = $this->createCollectionResources(
+            $response->results,
+            $resource
+        );
+        return $collection;
     }
-    $collection->data = $this->createCollectionResources(
-      $response->results,
-      $resource
-    );
-    return $collection;
-  }
 
-  /**
-   * Creates an array of a single Etsy resource.
-   *
-   * @param array $records
-   * @param string $resource
-   * @return array
-   */
-  public function createCollectionResources(array $records, string $resource): array
-  {
-    $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
-    return array_map(function($record) use($resource) {
-      return new $resource($this, $record);
-    }, $records);
-  }
+    /**
+     * Creates an array of a single Etsy resource.
+     *
+     * @param array $records
+     * @param string $resource
+     * @return array
+     */
+    public function createCollectionResources(array $records, string $resource): array
+    {
+        $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
+        return array_map(function($record) use($resource) {
+            return new $resource($this, $record);
+        }, $records);
+    }
 
     /**
      * Creates a new Etsy resource.
@@ -108,90 +108,51 @@ class Etsy {
      * @param string $resource
      * @return Resource
      */
-  public function createResource(
-      stdClass $record,
-      string $resource
-  ): Resource
-  {
-    $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
-    return new $resource($this, $record);
-  }
-
-  /**
-   * Check to confirm connectivity to the Etsy API with an application
-   *
-   * @link https://developers.etsy.com/documentation/reference#operation/ping
-   * @return integer|false
-   */
-  public function ping()
-  {
-    $response = $this->client()->get("/application/openapi-ping");
-    return $response->application_id ?? false;
-  }
-
-  /**
-   * Only supports getting the user for who the current API KEY is associated with.
-   *
-   * @return User
-   */
-  public function getUser(): User
-  {
-    $user_id = explode(".", $this->api_key)[0];
-    $response = $this->client()->get("/application/users/{$user_id}");
-    return $this->getResource($response, "User");
-  }
+    public function createResource(
+        stdClass $record,
+        string $resource
+    ): Resource
+    {
+        $resource = __NAMESPACE__ . "\\Resources\\{$resource}";
+        return new $resource($this, $record);
+    }
 
     /**
-     * Gets an Etsy shop. If no shop_id is specified the current user will be queried for an associated shop.
+     * Check to confirm connectivity to the Etsy API with an application
      *
-     * @param int|null $shop_id
-     * @return Shop
+     * @link https://developers.etsy.com/documentation/reference#operation/ping
+     * @return integer|false
      */
-  public function getShop(
-    int $shop_id = null
-  ): Shop
-  {
-    if (!$shop_id) {
-      return $this->getUser()->getShop();
+    public function ping()
+    {
+        $response = $this->client()->get("/application/openapi-ping");
+        return $response->application_id ?? false;
     }
-    $response = $this->client()->get("/application/shops/{$shop_id}");
-    return $this->getResource($response, "Shop");
-  }
 
     /**
-     * Search for shops using a keyword.
+     * Only supports getting the user for whom the current API KEY is associated with.
      *
-     * @param string $keyword
-     * @param array $params
-     * @return Collection|Shop[]
-     * @throws ApiException
+     * @return User
      */
-  public function getShops(string $keyword, array $params = []) : Collection
-  {
-    if(!strlen(trim($keyword))) {
-      throw new ApiException("You must specify a keyword when searching for Etsy shops.");
+    public function getUser(): User
+    {
+        $user_id = explode(".", $this->api_key)[0];
+        $response = $this->client()->get("/application/users/{$user_id}");
+        return $this->getResource($response, "User");
     }
-    $params['shop_name'] = $keyword;
-    $response = $this->client()->get(
-      "/application/shops",
-      $params
-    );
 
-    return $this->getResource($response, "Shop");
-  }
-
-  /**
-   * Retrieves the full hierarchy tree of seller taxonomy nodes.
-   *
-   * @return Collection|Taxonomy[]
-   */
-  public function getSellerTaxonomy(): Collection
-  {
-    $response = $this->client()->get(
-      "/application/seller-taxonomy/nodes"
-    );
-    return $this->getResource($response, "Taxonomy");
-  }
+    /**
+     * Retrieves the full hierarchy tree of seller taxonomy nodes.
+     *
+     * @return Collection|Taxonomy[]
+     */
+    public function getSellerTaxonomy(): Collection
+    {
+        $response = $this->client()->get(
+            "/application/seller-taxonomy/nodes"
+        );
+        return $this->getResource($response, "Taxonomy");
+    }
 
     /**
      * Retrieves the properties of seller taxonomy node.
@@ -199,82 +160,68 @@ class Etsy {
      * @param int $taxonomy_id
      * @return Collection
      */
-  public function getSellerTaxonomyProperties(int $taxonomy_id): Collection
-  {
-      $response = $this->client()->get(
-          "/application/seller-taxonomy/nodes/{$taxonomy_id}/properties"
-      );
-      return $this->getResource($response, "TaxonomyProperty");
-  }
-
-    /**
-     * Retrieves a list of available shipping profiles
-     *
-     * @param int $shop_id
-     * @return Collection|ShippingProfile[]
-     */
-    public function getShippingProfiles(int $shop_id): Collection
+    public function getSellerTaxonomyProperties(int $taxonomy_id): Collection
     {
         $response = $this->client()->get(
-            "/application/shops/{$shop_id}/shipping-profiles"
+            "/application/seller-taxonomy/nodes/{$taxonomy_id}/properties"
         );
-        return $this->getResource($response, "ShippingProfile");
+        return $this->getResource($response, "TaxonomyProperty");
     }
 
-  /**
-   * Retrieves a list of available shipping carriers and the mail classes associated with them for a given country
-   *
-   * @param string $iso_code
-   * @return Collection|ShippingCarrier[]
-   */
-  public function getShippingCarriers(string $iso_code)
-  {
-    $response = $this->client()->get(
-      "/application/shipping-carriers",
-      [
-        "origin_country_iso" => $iso_code
-      ]
-    );
-    return $this->getResource($response, "ShippingCarrier");
-  }
+    /**
+     * Retrieves a list of available shipping carriers and the mail classes associated with them for a given country
+     *
+     * @param string $iso_code
+     * @return Collection|ShippingCarrier[]
+     */
+    public function getShippingCarriers(string $iso_code)
+    {
+        $response = $this->client()->get(
+            "/application/shipping-carriers",
+            [
+                "origin_country_iso" => $iso_code
+            ]
+        );
+        return $this->getResource($response, "ShippingCarrier");
+    }
 
-  /**
-   * Gets an individual listing on Etsy.
-   *
-   * @link https://developers.etsy.com/documentation/reference#operation/getListing
-   * @param float $listing_id
-   * @param array $includes
-   * @return Listing
-   */
-  public function getListing(
-    float $listing_id,
-    array $includes = []
-  ): Listing
-  {
-    $response = $this->client()->get(
-      "/application/listings/{$listing_id}",
-      [
-        'includes' => $includes
-      ]
-    );
-    return $this->getResource($response, "Listing");
-  }
+    /**
+     * Gets an individual listing on Etsy.
+     *
+     * @link https://developers.etsy.com/documentation/reference#operation/getListing
+     * @param float $listing_id
+     * @param array $includes
+     * @return Listing
+     */
+    public function getListing(
+        float $listing_id,
+        array $includes = []
+    ): Listing
+    {
+        $response = $this->client()->get(
+            "/application/listings/{$listing_id}",
+            [
+                'includes' => $includes
+            ]
+        );
+        return $this->getResource($response, "Listing");
+    }
 
-  /**
-   * Gets all public listings on Etsy. Filter with keyword param.
-   *
-   * @link https://developers.etsy.com/documentation/reference#operation/findAllListingsActive
-   * @param array $params
-   * @return Collection|Listing[]
-   */
-  public function getPublicListings(array $params = []): Collection
-  {
-    $response = $this->client()->get(
-      "/application/listings/active",
-      $params
-    );
-    return $this->getResource($response, "Listing");
-  }
+    /**
+     * Gets all public listings on Etsy. Filter with keyword param.
+     *
+     * @link https://developers.etsy.com/documentation/reference#operation/findAllListingsActive
+     * @param array $params
+     * @return Collection|Listing[]
+     */
+    public function getPublicListings(array $params = []): Collection
+    {
+        $response = $this->client()->get(
+            "/application/listings/active",
+            $params
+        );
+        return $this->getResource($response, "Listing");
+    }
 
     /**
      * Get the specified Etsy listings. Supports a maximum of 100 listing IDs.
@@ -285,27 +232,27 @@ class Etsy {
      * @return Collection|Listing[]
      * @throws ApiException
      */
-  public function getListings(
-    array $listing_ids,
-    array $includes = []
-  ): Collection
-  {
-    if(!count($listing_ids)
-      || count($listing_ids) > 100) {
-      throw new ApiException("Query requires at least one listing ID and cannot exceed a maximum of 100 listing IDs.");
+    public function getListings(
+        array $listing_ids,
+        array $includes = []
+    ): Collection
+    {
+        if(!count($listing_ids)
+            || count($listing_ids) > 100) {
+            throw new ApiException("Query requires at least one listing ID and cannot exceed a maximum of 100 listing IDs.");
+        }
+        $response = $this->client()->get(
+            "/application/listings/batch",
+            [
+                "listing_ids" => $listing_ids,
+                "includes" => $includes
+            ]
+        );
+        return $this->getResource($response, "Listing");
     }
-    $response = $this->client()->get(
-      "/application/listings/batch",
-      [
-        "listing_ids" => $listing_ids,
-        "includes" => $includes
-      ]
-    );
-    return $this->getResource($response, "Listing");
-  }
 
-  public function client(): Client
-  {
-      return $this->client;
-  }
+    public function client(): Client
+    {
+        return $this->client;
+    }
 }

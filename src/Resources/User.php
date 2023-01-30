@@ -17,51 +17,64 @@ use Etsy\Resource;
  */
 class User extends Resource {
 
-  /**
-   * Get all addresses for this user.
-   *
-   * @param array $params
-   * @return Collection|UserAddress[]
-   */
-  public function getAddresses(array $params = []): Collection
-  {
-    return $this->request(
-      "GET",
-      "/application/user/addresses",
-      "UserAddress",
-      $params
-    );
-  }
+    /**
+    * Get all addresses for this user.
+    *
+    * @param array $params
+    * @return Collection|UserAddress[]
+    */
+    public function getAddresses(array $params = []): Collection
+    {
+        return $this->request(
+            "GET",
+            "/application/user/addresses",
+            "UserAddress",
+            $params
+        );
+    }
 
-  /**
-   * Gets a single address for this user.
-   *
-   * @NOTE this endpoint is not yet active.
-   *
-   * @param integer/string $address_id
-   * @return UserAddress
-   */
-  public function getAddress($address_id): UserAddress
-  {
-    return $this->request(
-      "GET",
-      "/application/user/addresses/{$address_id}",
-      "UserAddress"
-    );
-  }
+    /**
+     * Gets a single address for this user.
+     *
+     * @NOTE this endpoint is not yet active.
+     *
+     * @param int $address_id
+     * @return UserAddress
+     */
+    public function getAddress(int $address_id): UserAddress
+    {
+        return $this->request(
+            "GET",
+            "/application/user/addresses/{$address_id}",
+            "UserAddress"
+        );
+    }
 
-  /**
-   * Gets the user's Etsy shop.
-   *
-   * @return Shop
-   */
-  public function getShop(): Shop
-  {
-    return $this->request(
-      "GET",
-      "/application/users/{$this->user_id}/shops",
-      "Shop"
-    );
-  }
+    /**
+     * @param string $name
+     * @return Shop|null
+     */
+    public function getShop(string $name): ?Shop
+    {
+        /** @var ?Shop $shop */
+        $shop = $this->getShops(['shop_name' => $name])->first();
 
+        return $shop;
+    }
+
+    /**
+     * Gets the user's Etsy shops.
+     *
+     * @param array $params
+     * @return Collection
+     */
+    public function getShops(array $params = []): Collection
+    {
+        return $this->request(
+            "GET",
+            "/application/users/{$this->user_id}/shops",
+            "Shop",
+            $params
+        );
+    }
 }
