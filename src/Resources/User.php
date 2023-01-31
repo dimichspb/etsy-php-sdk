@@ -18,11 +18,11 @@ use Etsy\Resource;
 class User extends Resource {
 
     /**
-    * Get all addresses for this user.
-    *
-    * @param array $params
-    * @return Collection|UserAddress[]
-    */
+     * Get all addresses for this user.
+     *
+     * @param array $params
+     * @return Collection|UserAddress[]
+     */
     public function getAddresses(array $params = []): Collection
     {
         return $this->request(
@@ -77,18 +77,15 @@ class User extends Resource {
      * Gets the user's Etsy shops.
      *
      * @param array $params
-     * @return Collection
+     * @return Collection|Shop
      */
-    public function getShops(array $params = []): Collection
+    public function getShops(array $params = [])
     {
-        $result = $this->request(
+        return $this->request(
             "GET",
             "/application/users/{$this->user_id}/shops",
             "Shop",
             $params
         );
-
-
-        return $result instanceof Collection? $result: new Collection($this->etsy, )
     }
 }
