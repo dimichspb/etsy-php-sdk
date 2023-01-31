@@ -196,7 +196,7 @@ class Etsy {
     public function getListing(
         float $listing_id,
         array $includes = []
-    ): Listing
+    ): ?Listing
     {
         $response = $this->client()->get(
             "/application/listings/{$listing_id}",

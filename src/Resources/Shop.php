@@ -7,7 +7,7 @@ use Etsy\Resource;
 use Etsy\Exception\ApiException;
 
 /**
- * Shop resource class. Represents a Etsy user's shop.
+ * Shop resource class. Represents Etsy user's shop.
  *
  * @link https://developers.etsy.com/documentation/reference/#tag/Shop
  * @author Rhys Hall hello@rhyshall.com

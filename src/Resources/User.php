@@ -56,10 +56,21 @@ class User extends Resource {
      */
     public function getShop(string $name): ?Shop
     {
-        /** @var ?Shop $shop */
-        $shop = $this->getShops(['shop_name' => $name])->first();
+        /** @var Collection $shop */
+        $shops = $this->getShops();
+        foreach ($shops as $shop) {
+            if (!$shop instanceof \stdClass) {
+                continue;
+            }
+            if (!property_exists($shop, 'shop_name')) {
+                continue;
+            }
+            if ($shop->shop_name === $name) {
+                return new Shop($this->etsy, $shop);
+            }
+        }
 
-        return $shop;
+        return null;
     }
 
     /**
@@ -70,11 +81,14 @@ class User extends Resource {
      */
     public function getShops(array $params = []): Collection
     {
-        return $this->request(
+        $result = $this->request(
             "GET",
             "/application/users/{$this->user_id}/shops",
             "Shop",
             $params
         );
+
+
+        return $result instanceof Collection? $result: new Collection($this->etsy, )
     }
 }
