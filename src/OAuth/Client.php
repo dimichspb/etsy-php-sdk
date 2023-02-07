@@ -155,8 +155,8 @@ abstract class Client {
                 );
             } else {
                 throw new RequestException(
-                    "Received HTTP status code [$status_code] with body {$response->getBody()}";
-                )
+                    "Received HTTP status code [$status_code] with body {$response->getBody()}"
+                );
             }
         }
     }
