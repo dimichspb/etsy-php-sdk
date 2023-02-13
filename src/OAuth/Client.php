@@ -300,6 +300,11 @@ abstract class Client {
           throw $e;
         }
         $response = $e->getResponse();
+        if (is_null($response)) {
+            throw new OAuthException(
+                "Received Exception with code {$e->getCode()} and message  {$e->getMessage()} when requesting access token."
+            );
+        }
         $body = json_decode($response->getBody(), false);
         $status_code = $response->getStatusCode();
         $error_msg = "with error \"{$body->error}\"";
