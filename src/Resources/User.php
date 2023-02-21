@@ -56,30 +56,18 @@ class User extends Resource {
      */
     public function getShop(string $name): ?Shop
     {
-        /** @var Collection $shop */
-        $shops = $this->getShops();
-        foreach ($shops as $shop) {
-            if (!$shop instanceof \stdClass) {
-                continue;
-            }
-            if (!property_exists($shop, 'shop_name')) {
-                continue;
-            }
-            if ($shop->shop_name === $name) {
-                return new Shop($this->etsy, $shop);
-            }
-        }
+        $shop = $this->getShops();
 
-        return null;
+        return $shop->shop_name === $name? $shop: null;
     }
 
     /**
      * Gets the user's Etsy shops.
      *
      * @param array $params
-     * @return Collection|Shop
+     * @return Shop
      */
-    public function getShops(array $params = [])
+    public function getShops(array $params = []): Shop
     {
         return $this->request(
             "GET",
